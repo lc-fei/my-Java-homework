@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { composeEventHandlers } from 'element-plus/es/utils';
 // 表示表单状态，如果是登录状态就是 true 否则 false
 const islogin = ref(true)
 const isloginlogin = ref(true)
@@ -73,6 +74,27 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
 }
+
+
+// my js
+let timer: number
+let changeOk: boolean = true
+const change = () => {
+  if(changeOk === false) return
+  changeOk = false
+  islogin.value = !islogin.value
+  if(timer)
+  {
+    clearTimeout(timer)
+  }
+  timer = setTimeout(() => {
+    isloginlogin.value = !isloginlogin.value
+    const authertimer = setTimeout(() => {
+      changeOk = true
+      clearTimeout(authertimer)
+    }, 500)
+  }, 500);
+}
 </script>
 
 <template>
@@ -80,7 +102,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
       <div class="head"></div>
       <div :class="['login-container', islogin ? '' : 'active']">
         <div class="button-wrapper">
-          <button class="changebtn" @click="islogin = !islogin">
+          <button class="changebtn" @click="change">
           <div class="txt">去注册</div>
           <div class ="txt">去登录</div>
           </button>
@@ -89,7 +111,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
           <h1 v-if="isloginlogin">欢迎回来</h1>
           <h1 v-else>用户注册</h1>
           <el-form
-            v-if="!isloginlogin"
+            v-if="isloginlogin"
             ref="ruleFormRef"
             :model="ruleForm"
             status-icon
@@ -98,21 +120,19 @@ const resetForm = (formEl: FormInstance | undefined) => {
             label-width="120px"
             class="demo-ruleForm"
           >
-          <el-form-item label="账号" prop="pass">
+          <el-form-item label="账号" prop="pass" class="logincla">
             <!-- autocomplete="off" 关闭表单记忆 -->
             <el-input v-model="ruleForm.pass" type="text" autocomplete="off" />
           </el-form-item>
-          <el-form-item label="密码" prop="checkPass">
-            <!-- <el-col :span="90"> -->
+          <el-form-item label="密码" prop="checkPass" class="logincla">
             <el-input
               v-model="ruleForm.checkPass"
               type="password"
               autocomplete="off"
               show-password
             />
-            <!-- </el-col> -->
           </el-form-item>
-          <el-form-item class="el-sub">
+          <el-form-item class="el-sub logincla">
             <el-button type="primary" @click="submitForm(ruleFormRef)"
               >用户登录
             </el-button>
@@ -133,21 +153,24 @@ const resetForm = (formEl: FormInstance | undefined) => {
             <el-input v-model="ruleForm.pass" type="text" autocomplete="off"/>
           </el-form-item>
           <el-form-item label="密码" prop="checkPass">
-            <!-- <el-col :span="90"> -->
             <el-input
               v-model="ruleForm.checkPass"
               type="password"
               autocomplete="off"
               show-password
             />
-            <!-- </el-col> -->
+          </el-form-item>
+          <el-form-item label="姓名" prop="pass">
+            <el-input v-model="ruleForm.pass" type="text" autocomplete="off"/>
+          </el-form-item>
+          <el-form-item label="身份证号" prop="pass">
+            <el-input v-model="ruleForm.pass" type="text" autocomplete="off"/>
           </el-form-item>
           <el-form-item class="el-sub">
             <el-button type="primary" @click="submitForm(ruleFormRef)"
               >用户登录
             </el-button>
           </el-form-item>
-          <div class="admin-sub" @click="submitForm(ruleFormRef)">管理员登录</div>
         </el-form>
         </div>
       </div>
@@ -244,7 +267,7 @@ h1 {
   display: inline-block;
   transition: all 1s ease-in-out;
 }
-.el-form-item {
+.logincla {
   margin: 20px 0;
 }
 .el-sub {
