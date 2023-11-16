@@ -7,8 +7,9 @@ const islogin = ref(true)
 const isloginlogin = ref(true)
 
 //element ui
-// 这是一个ref，用于引入表单实例
-const ruleFormRef = ref<FormInstance>()
+// 这是一个ref，用于引入表单实例    创建loginFormRef实例
+const loginFormRef = ref<FormInstance>()
+const signinFormRef = ref<FormInstance>()
 
 const checkAge = (rule: any, value: any, callback: any) => {
   if (!value) {
@@ -27,35 +28,48 @@ const checkAge = (rule: any, value: any, callback: any) => {
   }, 1000)
 }
 
-const validatePass = (rule: any, value: any, callback: any) => {
-  if (value === '') {
-    callback(new Error('Please input the password'))
-  } else {
-    if (ruleForm.checkPass !== '') {
-      if (!ruleFormRef.value) return
-      ruleFormRef.value.validateField('checkPass', () => null)
-    }
-    callback()
-  }
-}
-const validatePass2 = (rule: any, value: any, callback: any) => {
-  if (value === '') {
-    callback(new Error('Please input the password again'))
-  } else if (value !== ruleForm.pass) {
-    callback(new Error("Two inputs don't match!"))
-  } else {
-    callback()
-  }
-}
+// const validatePass = (rule: any, value: any, callback: any) => {
+//   if (value === '') {
+//     callback(new Error('Please input the password'))
+//   } else {
+//     if (ruleForm.checkPass !== '') {
+//       if (!ruleFormRef.value) return     //这里还有俩
+//       ruleFormRef.value.validateField('checkPass', () => null)
+//     }
+//     callback()
+//   }
+// }
+// const validatePass2 = (rule: any, value: any, callback: any) => {
+//   if (value === '') {
+//     callback(new Error('Please input the password again'))
+//   } else if (value !== ruleForm.pass) {
+//     callback(new Error("Two inputs don't match!"))
+//   } else {
+//     callback()
+//   }
+// }
 
-const ruleForm = reactive({
-  pass: '',
-  checkPass: '',
+const loginForm = reactive({
+  username: '',
+  pwd: '',
 })
 
-const rules = reactive<FormRules<typeof ruleForm>>({
-  pass: [{ validator: validatePass, trigger: 'blur' }],
-  checkPass: [{ validator: validatePass2, trigger: 'blur' }],
+const loginRules = reactive<FormRules<typeof loginForm>>({
+  username: [{trigger: 'blur' }],
+  pwd: [{trigger: 'blur' }],   // validator: validatePass2, 
+})
+
+const signinForm = reactive({
+  username: '',
+  pwd: '',
+  name: '',
+  IdNumber: ''
+})
+const signinRules = reactive<FormRules<typeof signinForm>>({
+  username:[{trigger: 'blur' }],
+  pwd:[{trigger: 'blur' }],
+  name:[{trigger: 'blur' }],
+  IdNumber:[{trigger: 'blur' }]
 })
 
 const submitForm = (formEl: FormInstance | undefined) => {
@@ -112,62 +126,62 @@ const change = () => {
           <h1 v-else>用户注册</h1>
           <el-form
             v-if="isloginlogin"
-            ref="ruleFormRef"
-            :model="ruleForm"
+            ref="loginFRormRef"
+            :model="loginForm"
             status-icon
-            :rules="rules"
+            :rules="loginRules"
             :inline="true"
             label-width="120px"
             class="demo-ruleForm"
           >
           <el-form-item label="账号" prop="pass" class="logincla">
             <!-- autocomplete="off" 关闭表单记忆 -->
-            <el-input v-model="ruleForm.pass" type="text" autocomplete="off" />
+            <el-input v-model="loginForm.username" type="text" autocomplete="off" />
           </el-form-item>
           <el-form-item label="密码" prop="checkPass" class="logincla">
             <el-input
-              v-model="ruleForm.checkPass"
+              v-model="loginForm.pwd"
               type="password"
               autocomplete="off"
               show-password
             />
           </el-form-item>
           <el-form-item class="el-sub logincla">
-            <el-button type="primary" @click="submitForm(ruleFormRef)"
+            <el-button type="primary" @click="submitForm(loginFormRef)"
               >用户登录
             </el-button>
           </el-form-item>
-          <div class="admin-sub" @click="submitForm(ruleFormRef)">管理员登录</div>
+          <div class="admin-sub" @click="submitForm(loginFormRef)">管理员登录</div>
         </el-form>
         <el-form
             v-else
-            ref="ruleFormRef"
-            :model="ruleForm"
+            ref="signinFormRef"
+            :model="signinForm"
             status-icon
-            :rules="rules"
+            :rules="signinRules"
             :inline="true"
             label-width="120px"
             class="demo-ruleForm"
           >
           <el-form-item label="账号" prop="pass">
-            <el-input v-model="ruleForm.pass" type="text" autocomplete="off"/>
+            <el-input v-model="signinForm.username" type="text" autocomplete="off"/>
           </el-form-item>
           <el-form-item label="密码" prop="checkPass">
             <el-input
-              v-model="ruleForm.checkPass"
+              v-model="signinForm.pwd"
               type="password"
               autocomplete="off"
               show-password
             />
           </el-form-item>
           <el-form-item label="姓名" prop="pass">
-            <el-input v-model="ruleForm.pass" type="text" autocomplete="off"/>
+            <el-input v-model="signinForm.name" type="text" autocomplete="off"/>
           </el-form-item>
           <el-form-item label="身份证号" prop="pass">
-            <el-input v-model="ruleForm.pass" type="text" autocomplete="off"/>
+            <el-input v-model="signinForm.IdNumber" type="text" autocomplete="off"/>
           </el-form-item>
           <el-form-item class="el-sub">
-            <el-button type="primary" @click="submitForm(ruleFormRef)"
+            <el-button type="primary" @click="submitForm(signinFormRef)"
               >用户登录
             </el-button>
           </el-form-item>
@@ -222,7 +236,7 @@ const change = () => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  width: 35%;
+  width: 40%;
   background-color: pink;
   transition: all 1s ease-in-out;
 }
@@ -273,13 +287,14 @@ h1 {
 .el-sub {
   display: block;
   width: 100%;
-  margin-left: 10%;
+  margin-left: 20%;
 }
 .el-button {
-  width: 75%;
+  width: 60%;
 }
 .admin-sub {
-  margin-left: 69%;
+  margin-left: 64%;
+  /* 69 */
   font-size: 15px;
   cursor: pointer;
 }
