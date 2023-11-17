@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { composeEventHandlers } from 'element-plus/es/utils';
+// import { composeEventHandlers } from 'element-plus/es/utils';
 // 表示表单状态，如果是登录状态就是 true 否则 false
 const islogin = ref(true)
 const isloginlogin = ref(true)
@@ -10,23 +10,6 @@ const isloginlogin = ref(true)
 // 这是一个ref，用于引入表单实例    创建loginFormRef实例
 const loginFormRef = ref<FormInstance>()
 const signinFormRef = ref<FormInstance>()
-
-const checkAge = (rule: any, value: any, callback: any) => {
-  if (!value) {
-    return callback(new Error('Please input the age'))
-  }
-  setTimeout(() => {
-    if (!Number.isInteger(value)) {
-      callback(new Error('Please input digits'))
-    } else {
-      if (value < 18) {
-        callback(new Error('Age must be greater than 18'))
-      } else {
-        callback()
-      }
-    }
-  }, 1000)
-}
 
 // const validatePass = (rule: any, value: any, callback: any) => {
 //   if (value === '') {
@@ -49,32 +32,66 @@ const checkAge = (rule: any, value: any, callback: any) => {
 //   }
 // }
 
+// 登录表单元素
 const loginForm = reactive({
   username: '',
   pwd: '',
 })
 
 const loginRules = reactive<FormRules<typeof loginForm>>({
-  username: [{trigger: 'blur' }],
-  pwd: [{trigger: 'blur' }],   // validator: validatePass2, 
+  username: [
+    { required: true, message: '用户名不能为空', trigger: 'blur' }
+    ],
+  pwd: [{required: true, message: '密码不能为空', trigger: 'blur' }],   // validator: validatePass2, 
 })
 
+// 注册表单元素
 const signinForm = reactive({
   username: '',
   pwd: '',
   name: '',
   IdNumber: ''
 })
+//身份证号表单验证函数
+const validateIdNumber = (rule: any, value: any, callback: any) => {
+  let _IDRe18 = /^([1-6][1-9]|50)\d{4}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
+  let _IDre15 =  /^([1-6][1-9]|50)\d{4}\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}$/
+  if ( _IDRe18.test( value ) || _IDre15.test( value )) {
+    callback()
+  }else {
+    callback(new Error('身份证号格式错误'))
+  }
+}
 const signinRules = reactive<FormRules<typeof signinForm>>({
-  username:[{trigger: 'blur' }],
-  pwd:[{trigger: 'blur' }],
-  name:[{trigger: 'blur' }],
-  IdNumber:[{trigger: 'blur' }]
+  username:[{required: true, message: '用户名不能为空',trigger: 'blur' }],
+  pwd:[{required: true, message: '密码不能为空',trigger: 'blur' }],
+  name:[{required: true, message: '姓名不能为空',trigger: 'blur' },
+    { min: 2, max: 18, message: '姓名格式不对', trigger: 'blur' },
+  ],
+  IdNumber:[
+    {required: true, message: '身份证号不能为空',trigger: 'blur' },
+    { validator: validateIdNumber, trigger: 'blur' },
+    ]
 })
 
-const submitForm = (formEl: FormInstance | undefined) => {
+
+
+// 登录接口
+const loginSubmitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  formEl.validate((valid) => {
+  await formEl.validate().then((valid) => {
+    if (valid) {
+      console.log('submit!')
+    } else {
+      console.log('error submit!')
+      return false
+    }
+  })
+}
+//注册接口
+const siginSubmitForm = async (formEl: FormInstance | undefined) => {
+  if(!formEl) return
+  await formEl.validate().then((valid) => {
     if (valid) {
       console.log('submit!')
     } else {
@@ -84,10 +101,12 @@ const submitForm = (formEl: FormInstance | undefined) => {
   })
 }
 
-const resetForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  formEl.resetFields()
-}
+
+//reset函数
+// const resetForm = (formEl: FormInstance | undefined) => {
+//   if (!formEl) return
+//   formEl.resetFields()
+// }S
 
 
 // my js
@@ -126,7 +145,7 @@ const change = () => {
           <h1 v-else>用户注册</h1>
           <el-form
             v-if="isloginlogin"
-            ref="loginFRormRef"
+            ref="loginFormRef"
             :model="loginForm"
             status-icon
             :rules="loginRules"
@@ -134,11 +153,11 @@ const change = () => {
             label-width="120px"
             class="demo-ruleForm"
           >
-          <el-form-item label="账号" prop="pass" class="logincla">
+          <el-form-item label="用户名" prop="username" class="logincla">
             <!-- autocomplete="off" 关闭表单记忆 -->
             <el-input v-model="loginForm.username" type="text" autocomplete="off" />
           </el-form-item>
-          <el-form-item label="密码" prop="checkPass" class="logincla">
+          <el-form-item label="密码" prop="pwd" class="logincla">
             <el-input
               v-model="loginForm.pwd"
               type="password"
@@ -147,11 +166,11 @@ const change = () => {
             />
           </el-form-item>
           <el-form-item class="el-sub logincla">
-            <el-button type="primary" @click="submitForm(loginFormRef)"
+            <el-button type="primary" @click="loginSubmitForm(loginFormRef)"
               >用户登录
             </el-button>
           </el-form-item>
-          <div class="admin-sub" @click="submitForm(loginFormRef)">管理员登录</div>
+          <!-- <div class="admin-sub" @click="submitForm(loginFormRef)">管理员登录</div> -->
         </el-form>
         <el-form
             v-else
@@ -163,10 +182,10 @@ const change = () => {
             label-width="120px"
             class="demo-ruleForm"
           >
-          <el-form-item label="账号" prop="pass">
+          <el-form-item label="用户名" prop="username">
             <el-input v-model="signinForm.username" type="text" autocomplete="off"/>
           </el-form-item>
-          <el-form-item label="密码" prop="checkPass">
+          <el-form-item label="密码" prop="pwd">
             <el-input
               v-model="signinForm.pwd"
               type="password"
@@ -174,15 +193,15 @@ const change = () => {
               show-password
             />
           </el-form-item>
-          <el-form-item label="姓名" prop="pass">
+          <el-form-item label="姓名" prop="name">
             <el-input v-model="signinForm.name" type="text" autocomplete="off"/>
           </el-form-item>
-          <el-form-item label="身份证号" prop="pass">
+          <el-form-item label="身份证号" prop="IdNumber">
             <el-input v-model="signinForm.IdNumber" type="text" autocomplete="off"/>
           </el-form-item>
           <el-form-item class="el-sub">
-            <el-button type="primary" @click="submitForm(signinFormRef)"
-              >用户登录
+            <el-button type="primary" @click="siginSubmitForm(signinFormRef)"
+              >用户注册
             </el-button>
           </el-form-item>
         </el-form>
