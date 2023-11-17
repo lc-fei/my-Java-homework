@@ -3,37 +3,21 @@ import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import {userLogin, adminLogin, userSignin} from '../../api/login'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router';
+import { useUserStore, useAdminStore } from '../../stores/index'
+
 
 // import { composeEventHandlers } from 'element-plus/es/utils';
 // 表示表单状态，如果是登录状态就是 true 否则 false
 const islogin = ref(true)
 const isloginlogin = ref(true)
-
+const router = useRouter()
+const adminStore = useAdminStore()
+const userStore = useUserStore()
 //element ui
 // 这是一个ref，用于引入表单实例    创建loginFormRef实例
 const loginFormRef = ref<FormInstance>()
 const signinFormRef = ref<FormInstance>()
-
-// const validatePass = (rule: any, value: any, callback: any) => {
-//   if (value === '') {
-//     callback(new Error('Please input the password'))
-//   } else {
-//     if (ruleForm.checkPass !== '') {
-//       if (!ruleFormRef.value) return     //这里还有俩
-//       ruleFormRef.value.validateField('checkPass', () => null)
-//     }
-//     callback()
-//   }
-// }
-// const validatePass2 = (rule: any, value: any, callback: any) => {
-//   if (value === '') {
-//     callback(new Error('Please input the password again'))
-//   } else if (value !== ruleForm.pass) {
-//     callback(new Error("Two inputs don't match!"))
-//   } else {
-//     callback()
-//   }
-// }
 
 // 登录表单元素
 const loginForm = reactive({
@@ -83,13 +67,15 @@ const loginSubmitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate().then((valid) => {
     if (valid) {
       console.log('userSubmit!')
-      userLogin(loginForm).then(() => {
+      userLogin(loginForm).then((res) => {
         ElMessage({
           message: '欢迎回来',
           type: 'success',
           duration: 1500, // 持续显示时间，单位毫秒
           center: true // 是否居中显示
         })
+        router.push('/user')
+        userStore.setToken(res.data)
       }).catch(err => {
         ElMessage({
           message: err,
@@ -98,8 +84,6 @@ const loginSubmitForm = async (formEl: FormInstance | undefined) => {
           center: true // 是否居中显示
         })
       })
-      
-      
     } else {
       console.log('error submit!')
       return false
@@ -113,13 +97,15 @@ const adminSubmitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate().then((valid) => {
     if (valid) {
       console.log('adminSubmit!')
-      adminLogin(loginForm).then(() => {
+      adminLogin(loginForm).then((res) => {
         ElMessage({
           message: '欢迎您，管理员！',
           type: 'success',
           duration: 1500, // 持续显示时间，单位毫秒
           center: true // 是否居中显示
         })
+        router.push('/administrator')
+        adminStore.setToken(res.data)
       }).catch(err => {
         ElMessage({
           message: err,
@@ -150,6 +136,7 @@ const siginSubmitForm = async (formEl: FormInstance | undefined) => {
           duration: 1500, // 持续显示时间，单位毫秒
           center: true // 是否居中显示
         })
+        change()
       }).catch(err => {
         ElMessage({
           message: err,

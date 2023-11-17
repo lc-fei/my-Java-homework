@@ -5,7 +5,6 @@ import administrator from '../views/home/AdmHome.vue'
 
 import cardata from '../views/administrator/carData/index.vue'
 import newcar from '../views/administrator/newCar/index.vue'
-import turnover from '../views/administrator/turnover/index.vue'
 
 import mydata from '../views/user/myData/index.vue'
 import rentcar from '../views/user/rentCar/index.vue'
@@ -20,15 +19,16 @@ const router = createRouter({
     {
       path: '/administrator',
       component: administrator,
+      redirect: '/administrator/cardata',
       children: [
         { path: '/administrator/cardata', component: cardata },
-        { path: '/administrator/newcar', component: newcar },
-        { path: '/administrator/turnover', component: turnover }
+        { path: '/administrator/newcar', component: newcar }
       ]
     },
     {
       path: '/user',
       component: user,
+      redirect: '/user/rentcar',
       children: [
         { path: '/user/mydata', component: mydata },
         { path: '/user/rentcar', component: rentcar }
@@ -42,10 +42,13 @@ const router = createRouter({
 router.beforeEach((to) => {
   // ...
   // 返回 false 以取消导航
+  // 注意pinia实例创建位置
+  const userStore = useUserStore()
+  const adminStore = useAdminStore()
   if (to.path === '/login') return
   else if (to.matched.some((record) => record.path.startsWith('/administrator'))) {
     console.log('判断为管理员')
-    if (!useAdminStore.token) {
+    if (!adminStore.token) {
       ElMessage({
         message: '请先登录',
         type: 'error',
@@ -56,7 +59,7 @@ router.beforeEach((to) => {
     }
   } else if (to.matched.some((record) => record.path.startsWith('/user'))) {
     console.log('判断为普通用户')
-    if (!useUserStore.token) {
+    if (!userStore.token) {
       ElMessage({
         message: '请先登录',
         type: 'error',
