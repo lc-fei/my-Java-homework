@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import {userLogin, adminLogin, userSignin} from '../../api/login'
+import { ElMessage } from 'element-plus'
+
 // import { composeEventHandlers } from 'element-plus/es/utils';
 // 表示表单状态，如果是登录状态就是 true 否则 false
 const islogin = ref(true)
@@ -74,26 +77,87 @@ const signinRules = reactive<FormRules<typeof signinForm>>({
     ]
 })
 
-
-
-// 登录接口
+// 用户登录接口
 const loginSubmitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate().then((valid) => {
     if (valid) {
-      console.log('submit!')
+      console.log('userSubmit!')
+      userLogin(loginForm).then(() => {
+        ElMessage({
+          message: '欢迎回来',
+          type: 'success',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      }).catch(err => {
+        ElMessage({
+          message: err,
+          type: 'error',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      })
+      
+      
     } else {
       console.log('error submit!')
       return false
     }
   })
 }
+
+//管理员登录接口
+const adminSubmitForm = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate().then((valid) => {
+    if (valid) {
+      console.log('adminSubmit!')
+      adminLogin(loginForm).then(() => {
+        ElMessage({
+          message: '欢迎您，管理员！',
+          type: 'success',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      }).catch(err => {
+        ElMessage({
+          message: err,
+          type: 'error',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      })
+      
+      
+    } else {
+      console.log('error submit!')
+      return false
+    }
+  })
+}
+
 //注册接口
 const siginSubmitForm = async (formEl: FormInstance | undefined) => {
   if(!formEl) return
   await formEl.validate().then((valid) => {
     if (valid) {
       console.log('submit!')
+      userSignin(signinForm).then(() => {
+        ElMessage({
+          message: '注册成功',
+          type: 'success',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      }).catch(err => {
+        ElMessage({
+          message: err,
+          type: 'error',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      })
     } else {
       console.log('error submit!')
       return false
@@ -152,6 +216,7 @@ const change = () => {
             :inline="true"
             label-width="120px"
             class="demo-ruleForm"
+            autocomplete="off"
           >
           <el-form-item label="用户名" prop="username" class="logincla">
             <!-- autocomplete="off" 关闭表单记忆 -->
@@ -170,7 +235,7 @@ const change = () => {
               >用户登录
             </el-button>
           </el-form-item>
-          <!-- <div class="admin-sub" @click="submitForm(loginFormRef)">管理员登录</div> -->
+          <div class="admin-sub" @click="adminSubmitForm(loginFormRef)">管理员登录</div>
         </el-form>
         <el-form
             v-else
@@ -181,6 +246,7 @@ const change = () => {
             :inline="true"
             label-width="120px"
             class="demo-ruleForm"
+            autocomplete="off"
           >
           <el-form-item label="用户名" prop="username">
             <el-input v-model="signinForm.username" type="text" autocomplete="off"/>
