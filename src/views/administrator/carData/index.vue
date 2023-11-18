@@ -151,7 +151,7 @@ const myDeleteCar = async () => {
       class="inlineblock"
     />
   </div>
-  <el-table :data="tableData" style="width: 100%" height="500px">
+  <el-table :data="tableData" style="width: 100%" height="290px">
     <el-table-column fixed label="状态" width="60">
       <template #default = scope>
         <div :class="scope.row.beginTime === null ? 'green' : 'red' "></div>
