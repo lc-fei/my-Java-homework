@@ -1,16 +1,42 @@
 <script lang="ts" setup>
-import { searchCar, rentCar,} from '../../../api/user'
+
+type myData = {
+  beginTime :string, 
+  brand:string,
+  deadline:string, 
+  model:string,
+  perRent: number,
+  type: string,
+  userId:number,
+  vehicleId:number,
+  vehicleLicense:string,
+}
+
+import { ElMessage } from 'element-plus';
+import { searchCar, rentCar} from '../../../api/user'
 //级联选择器
-import { ref } from 'vue'
+import { ref, onMounted} from 'vue'
 //响应式变量
 // 级联选择器的value
 const changeValue = ref([])
 
 // 搜索出的全部车辆
-const searchedCar = ref([])
-searchCar(changeValue.value).then(res => {
-  searchedCar.value = res.data.vehicleInfos
+const tableData = ref([
+
+])
+
+//初始化查找车辆
+onMounted(async () => {
+  try{
+    const res = await searchCar(changeValue.value)
+    tableData.value = res.data.vehicleInfos
+    console.log(tableData.value)
+  }catch (err) {
+    console.log(err)
+  }
+  
 })
+
 
 //用户租用的车辆  有bug
 // const userRentedCar = ref([])
@@ -64,9 +90,6 @@ const options = [
       },
     ],
   },
-
-
-
   {
     value: 'bus',
     label: '卡车',
@@ -82,65 +105,82 @@ const options = [
 ]
 
 // 表格
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-  },
-  {
-    date: '2016-05-08',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-  },
-  {
-    date: '2016-05-06',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-  },
-  {
-    date: '2016-05-07',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-  },
-]
+
+
+//对话框
+const centerDialogVisible = ref(false)
+const daysFormRef = ref()
+let daysObj = ref({
+  days: 0
+})
+
+// 正则匹配租金为正整数
+const validateDays = (rule, value, callback) => {
+  const zz = /^[1-9]\d*$/
+  if ( zz.test( value )) {
+    callback()
+  }else {
+    callback(new Error('租用天数只能为正整数'))
+  }
+}
+
+// 租金表单验证
+const daysRule = ref({
+  days: [
+    {required: true, message: '租用天数不能为空',trigger: 'blur' },
+    { validator: validateDays, trigger: 'blur' },
+  ]
+})
+
+//my-js
+let catchVehicleId = ref()
+let catchVehiclePerRent = ref()
+
+const myRentCar = async (formEl) => {
+  if(!formEl) return
+  await formEl.validate().then((valid) => {
+    if (valid) {
+      const days = daysObj.value.days
+      const vehicleId = catchVehicleId.value
+      const perRent = catchVehiclePerRent.value
+      const sumRent = perRent * days as number
+      // 改变状态
+      (tableData.value as myData[]).forEach(element => {
+        if(element.vehicleId === vehicleId)
+        {
+          element.beginTime = '2023-11-18 20:33:03'
+        }
+      });
+      rentCar({days, vehicleId}).then(() => {
+        centerDialogVisible.value = false
+        ElMessage({
+          message: `租车成功，共花费${sumRent}`,
+          type: 'success',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      })
+      .catch(err => {
+        ElMessage({
+          message: err,
+          type: 'error',
+          duration: 1500, // 持续显示时间，单位毫秒
+          center: true // 是否居中显示
+        })
+      })
+    } else {
+      console.log('error submit!')
+      return false
+    }})
+}
+
+const ckickBUtton = (id, perRent) => {
+  centerDialogVisible.value = true
+  catchVehicleId.value = id
+  catchVehiclePerRent.value = perRent
+}
 </script>
+
 
 <template>
   <div class="m-4">
@@ -154,20 +194,75 @@ const tableData = [
     />
   </div>
   <el-table :data="tableData" style="width: 100%" height="100%">
-    <el-table-column fixed prop="date" label="Date" width="150" />
-    <el-table-column prop="name" label="Name" width="120" />
-    <el-table-column prop="state" label="State" width="120" />
-    <el-table-column prop="city" label="City" width="320" />
-    <el-table-column prop="address" label="Address" width="600" />
-    <el-table-column prop="zip" label="Zip" width="120" />
+    <el-table-column fixed label="状态" width="60">
+      <template #default = scope>
+        <div :class="scope.row.beginTime === null ? 'green' : 'red' "></div>
+      </template>
+    </el-table-column>
+    <el-table-column prop="type" label="类型" width="150" />
+    <el-table-column prop="brand" label="品牌" width="150" />
+    <el-table-column prop="model" label="型号" width="150" />
+    <el-table-column prop="perRent" label="日租金" width="150" />
+    <el-table-column prop="vehicleLicense" label="车牌号码" width="300" />
+    <el-table-column fixed="right" label="操作" width="150" >
+      <template #default = scope>
+        <el-button type="primary" :disabled="scope.row.beginTime !== null" @click="ckickBUtton(scope.row.vehicleId, scope.row.perRent)">租用</el-button>
+      </template>
+    </el-table-column>
   </el-table>
-</template>
 
+  <el-dialog
+    v-model="centerDialogVisible"
+    title="汽车租用"
+    width="30%"
+    align-center
+  >
+    <!-- <span>Open the dialog from the center from the screen</span> -->
+    <el-form
+    ref="daysFormRef"
+    :model="daysObj"
+    status-icon
+    :rules="daysRule"
+    label-width="120px"
+    class="demo-ruleForm"
+  >
+  <el-form-item label="租用天数：" prop="days">
+            <el-input v-model="daysObj.days" type="text" autocomplete="off"/>
+          </el-form-item>
+  </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="myRentCar(daysFormRef)">
+          确定
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+</template>
 <style scoped>
+/* 对话框 */
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
 .m-4 {
   margin: 10px;
 }
 .inlineblock {
   display: inline-block;
 }
+
+.green {
+  background-color: green;
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+}
+.red {
+  background-color: red;
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+}
+
 </style>

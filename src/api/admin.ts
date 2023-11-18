@@ -76,7 +76,7 @@ export const searchCar = (arr) => {
   const [vehicleType, vehicleBrand, vehicleModel] = arr
 
   return request.post('/user/selectVehicle', {
-    pageNumber: 1,
+    pageNumber: 0,
     pageSize: 1000,
     vehicleType,
     vehicleBrand,
