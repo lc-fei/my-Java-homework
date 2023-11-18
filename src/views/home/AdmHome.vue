@@ -62,7 +62,7 @@ import { RouterLink } from 'vue-router';
   }
   
   .el-main {
-    background-color: #E9EEF3;
+    background-color: rgb(255,255,255);
     color: #333;
     text-align: center;
     padding: 0

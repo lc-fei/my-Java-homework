@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 type myData = {
   beginTime :string, 
   brand:string,
@@ -22,7 +21,6 @@ const changeValue = ref([])
 
 // 搜索出的全部车辆
 const tableData = ref([
-
 ])
 
 //初始化查找车辆
@@ -36,14 +34,6 @@ onMounted(async () => {
   }
   
 })
-
-
-//用户租用的车辆  有bug
-// const userRentedCar = ref([])
-// getMyRentingCar().then(res => {
-//   userRentedCar.value = res
-//   console.log(res)
-// })
 
 
 const props = {
@@ -111,7 +101,7 @@ const options = [
 const centerDialogVisible = ref(false)
 const daysFormRef = ref()
 let daysObj = ref({
-  days: 0
+  days: null
 })
 
 // 正则匹配租金为正整数
@@ -145,13 +135,13 @@ const myRentCar = async (formEl) => {
       const perRent = catchVehiclePerRent.value
       const sumRent = perRent * days as number
       // 改变状态
-      (tableData.value as myData[]).forEach(element => {
+      rentCar({days, vehicleId}).then(() => {
+        (tableData.value as myData[]).forEach(element => {
         if(element.vehicleId === vehicleId)
         {
           element.beginTime = '2023-11-18 20:33:03'
         }
-      });
-      rentCar({days, vehicleId}).then(() => {
+        })
         centerDialogVisible.value = false
         ElMessage({
           message: `租车成功，共花费${sumRent}`,
@@ -184,7 +174,7 @@ const ckickBUtton = (id, perRent) => {
 
 <template>
   <div class="m-4">
-    <h4 class="inlineblock">租车类型：</h4>
+    <h4 class="inlineblock">筛选：</h4>
     <el-cascader
       v-model="changeValue"
       :options="options"
@@ -193,7 +183,7 @@ const ckickBUtton = (id, perRent) => {
       class="inlineblock"
     />
   </div>
-  <el-table :data="tableData" style="width: 100%" height="100%">
+  <el-table :data="tableData" style="width: 100%" height="500px">
     <el-table-column fixed label="状态" width="60">
       <template #default = scope>
         <div :class="scope.row.beginTime === null ? 'green' : 'red' "></div>
@@ -246,7 +236,7 @@ const ckickBUtton = (id, perRent) => {
   margin-right: 10px;
 }
 .m-4 {
-  margin: 10px;
+  margin: 15px 0 15px -68%;
 }
 .inlineblock {
   display: inline-block;

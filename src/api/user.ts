@@ -7,7 +7,7 @@ export const getMyRentingCar = () => {
   const token = userStore.getToken()
   return request.post('/user/rentingVehicle', {
     pageSize: 1000,
-    pageNumber: 1
+    pageNumber: 0
   }, {
     headers: {
       token
@@ -73,8 +73,20 @@ export const charge = (obj) => {
   const token = userStore.getToken()
 
   const { chargeMoney } = obj
-  return request.post('/user/returnVehicle', {
+  return request.post('/user/charge', {
     chargeMoney
+  }, {
+    headers: {
+      token
+    }
+  })
+}
+
+//获取用户信息
+export const getUserInfo = () => {
+  const userStore = useUserStore()
+  const token = userStore.getToken()
+  return request.post('/user/getInfo', {
   }, {
     headers: {
       token

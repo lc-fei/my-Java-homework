@@ -1,6 +1,6 @@
 <template>
   <div class="common-layout">
-    <el-container>
+    <el-container style="justify-content: flex-start; align-items: flex-start;">
       <el-aside width="200px">
           <el-menu
             default-active="2"
@@ -24,7 +24,7 @@
           </el-menu>
         </el-aside>
       <el-container>
-        <el-header>
+        <el-header style="justify-content: flex-start; align-items: flex-start;">
         <h1>欢迎来到腾飞租车系统</h1>
       </el-header>
         <el-main>
@@ -62,7 +62,7 @@ import { RouterLink } from 'vue-router';
   }
   
   .el-main {
-    background-color: #E9EEF3;
+    background-color: rgb(255,255,255);
     color: #333;
     text-align: center;
     padding: 0
