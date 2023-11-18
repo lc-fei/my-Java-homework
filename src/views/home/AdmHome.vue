@@ -1,14 +1,13 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-header>
-        <h1>欢迎来到腾飞租车系统</h1>
-      </el-header>
-      <el-container>
-        <el-aside width="200px">
+      <el-aside width="200px">
           <el-menu
             default-active="2"
             class="el-menu-vertical-demo"
+            active-text-color="#ffd04b"
+            background-color="#545c64"
+            text-color="#fff"
             >
             <RouterLink to="/administrator/cardata">
               <el-menu-item index="1">
@@ -24,6 +23,10 @@
             </RouterLink>
           </el-menu>
         </el-aside>
+      <el-container>
+        <el-header>
+        <h1>欢迎来到腾飞租车系统</h1>
+      </el-header>
         <el-main>
           <RouterView></RouterView>
         </el-main>
@@ -46,15 +49,16 @@ import { RouterLink } from 'vue-router';
     background-color: rgba(34,130,254,.4);
     color: rgb(0,0,0);
     text-align: center;
-    line-height: 13vh;
-    height: 13vh;
+    line-height: 15vh;
+    height: 15vh;
   }
   .el-aside {
-    background-color: #D3DCE6;
+    background-color: rgb(47,64,88);
     color: #333;
     text-align: center;
-    height: 87vh;
+    height: 100vh;
     width: 259px;
+    padding-top: 15vh;
   }
   
   .el-main {
@@ -69,5 +73,8 @@ import { RouterLink } from 'vue-router';
   }
   a{
     text-decoration: none;
+  }
+  .el-menu {
+    background-color: rgb(47,64,88);
   }
 </style>
