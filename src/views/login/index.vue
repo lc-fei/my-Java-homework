@@ -37,10 +37,10 @@ const signinForm = reactive({
   username: '',
   pwd: '',
   name: '',
-  IdNumber: ''
+  idNumber: ''
 })
 //身份证号表单验证函数
-const validateIdNumber = (rule: any, value: any, callback: any) => {
+const validateidNumber = (rule: any, value: any, callback: any) => {
   let _IDRe18 = /^([1-6][1-9]|50)\d{4}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
   let _IDre15 =  /^([1-6][1-9]|50)\d{4}\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}$/
   if ( _IDRe18.test( value ) || _IDre15.test( value )) {
@@ -55,9 +55,9 @@ const signinRules = reactive<FormRules<typeof signinForm>>({
   name:[{required: true, message: '姓名不能为空',trigger: 'blur' },
     { min: 2, max: 18, message: '姓名格式不对', trigger: 'blur' },
   ],
-  IdNumber:[
+  idNumber:[
     {required: true, message: '身份证号不能为空',trigger: 'blur' },
-    { validator: validateIdNumber, trigger: 'blur' },
+    { validator: validateidNumber, trigger: 'blur' },
     ]
 })
 
@@ -249,8 +249,8 @@ const change = () => {
           <el-form-item label="姓名" prop="name">
             <el-input v-model="signinForm.name" type="text" autocomplete="off"/>
           </el-form-item>
-          <el-form-item label="身份证号" prop="IdNumber">
-            <el-input v-model="signinForm.IdNumber" type="text" autocomplete="off"/>
+          <el-form-item label="身份证号" prop="idNumber">
+            <el-input v-model="signinForm.idNumber" type="text" autocomplete="off"/>
           </el-form-item>
           <el-form-item class="el-sub">
             <el-button type="primary" @click="siginSubmitForm(signinFormRef)"
@@ -309,7 +309,7 @@ const change = () => {
   justify-content: center;
   height: 100%;
   width: 40%;
-  background-color: pink;
+  background-color: rgb(34,130,254);
   transition: all 1s ease-in-out;
 }
 .changebtn {

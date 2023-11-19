@@ -1,5 +1,7 @@
 import request from "../utils/request";
 
+
+//用户登录
 export const userLogin = (obj) => {
   const { username, pwd } = obj
   return request.post('/user/login', {
@@ -8,6 +10,7 @@ export const userLogin = (obj) => {
   })
 }
 
+//管理员登录
 export const adminLogin = (obj) => {
   const { username, pwd } = obj
   return request.post('/admin/login', {
@@ -16,12 +19,17 @@ export const adminLogin = (obj) => {
   })
 }
 
+//用户注册
 export const userSignin = (obj) => {
-  const { username, pwd, name, IdNumber } = obj
+  const { username, pwd, name, idNumber } = obj
   return request.post('/user/register', {
     username,
     pwd,
     name,
-    IdNumber
+    idNumber
+  }, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
 }
