@@ -31,10 +31,20 @@ const updateMyChange = async () => {
 
 
 onMounted(async () => {
-  const res = await getMyRentingCar()
-  console.log(res)
-  tableData.value = res.data.vehicleInfos
-  updateMyChange()
+  try {
+    const res = await getMyRentingCar()
+    console.log(res)
+    res.data.vehicleInfos.forEach(item => {
+      if(item.type === '客车') item.brand += '人)'
+      else if(item.type === '货车') item.brand += '吨)'
+      else return
+    })
+    tableData.value = res.data.vehicleInfos
+    updateMyChange()
+  } catch (error) {
+    console.log(error)
+  }
+
 })
 
 

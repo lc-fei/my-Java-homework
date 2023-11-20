@@ -76,6 +76,7 @@ const loginSubmitForm = async (formEl: FormInstance | undefined) => {
         })
         router.push('/user')
         userStore.setToken(res.data)
+        formEl.resetFields()
       }).catch(err => {
         ElMessage({
           message: err,
@@ -106,6 +107,7 @@ const adminSubmitForm = async (formEl: FormInstance | undefined) => {
         })
         router.push('/administrator')
         adminStore.setToken(res.data)
+        formEl.resetFields()
       }).catch(err => {
         ElMessage({
           message: err,
@@ -137,6 +139,7 @@ const siginSubmitForm = async (formEl: FormInstance | undefined) => {
           center: true // 是否居中显示
         })
         change()
+        formEl.resetFields()
       }).catch(err => {
         ElMessage({
           message: err,
@@ -151,13 +154,6 @@ const siginSubmitForm = async (formEl: FormInstance | undefined) => {
     }
   })
 }
-
-
-//reset函数
-// const resetForm = (formEl: FormInstance | undefined) => {
-//   if (!formEl) return
-//   formEl.resetFields()
-// }S
 
 
 // my js

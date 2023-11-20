@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-// type myData = {
-//   beginTime :string, 
-//   brand:string,
-//   deadline:string, 
-//   model:string,
-//   perRent: number,
-//   type: string,
-//   userId:number,
-//   vehicleId:number,
-//   vehicleLicense:string,
-// }
+type myData = {
+  beginTime :string, 
+  brand:string,
+  deadline:string, 
+  model:string,
+  perRent: number,
+  type: string,
+  userId:number,
+  vehicleId:number,
+  vehicleLicense:string,
+}
 
 import { ElMessage } from 'element-plus';
 import { searchCar, deleteCar} from '../../../api/admin'
@@ -27,6 +27,11 @@ const tableData = ref([
 onMounted(async () => {
   try{
     const res = await searchCar(changeValue.value)
+    res.data.vehicleInfos.forEach(item => {
+      if(item.type === '客车') item.brand += '人)'
+      else if(item.type === '货车') item.brand += '吨)'
+      else return
+    })
     tableData.value = res.data.vehicleInfos
     console.log(tableData.value)
   }catch (err) {
@@ -125,7 +130,8 @@ const ckickBUtton = (id, beginTime) => {
 const myDeleteCar = async () => {
   const vehicleId = catchVehicleId.value
   try {
-    await deleteCar({vehicleId})
+    await deleteCar({vehicleId});
+    (tableData.value as myData[]) = (tableData.value as myData[]).filter(item => item.vehicleId !== vehicleId);
     ElMessage({
       message: '删除成功',
       type: 'success',

@@ -1,39 +1,45 @@
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive} from 'vue'
 import {addCar} from '../../../api/admin'
 import { ElMessage } from 'element-plus'
 
 // do not use same name with ref
 const formEl = ref()
 const form = reactive({
-  vehicleType: '',
+  vehicleType: '轿车',
   vehicleBrand: '',
   vehicleModel: '',
   perRent: '',
-  vehicleLicense: ''
+  vehicleLicense: '',
+  bigger: ''
 })
-
 
 const rules = reactive({
   vehicleType: [{ required: true, message: '请输入汽车类型', trigger: 'blur' }],
   vehicleBrand:[{ required: true, message: '请输入汽车品牌', trigger: 'blur' }],
   vehicleModel: [{ required: true, message: '请输入汽车型号', trigger: 'blur' }],
   perRent: [{ required: true, message: '请输入汽车日租金', trigger: 'blur' }],
-  vehicleLicense:[{ required: true, message: '请输入汽车车牌号', trigger: 'blur' }]
+  vehicleLicense:[{ required: true, message: '请输入汽车车牌号', trigger: 'blur' }],
+  bigger:[{ required: true, message: '该值不能为空', trigger: 'blur' }]
 })
 
+
+//提交表单
 const submitForm = async () => {
   if (!formEl.value) return
   await formEl.value.validate((valid, fields) => {
     if (valid) {
       try {
-      addCar(form)
-      ElMessage({
-          message: '添加成功',
-          type: 'success',
-          duration: 1500, // 持续显示时间，单位毫秒
-          center: true // 是否居中显示
-        })
+        form.vehicleBrand += '('
+        form.vehicleBrand += form.bigger
+        addCar(form)
+        ElMessage({
+            message: '添加成功',
+            type: 'success',
+            duration: 1500, // 持续显示时间，单位毫秒
+            center: true // 是否居中显示
+          })
+        formEl.value.resetFields()
       } catch (error) {
         console.log(error)
       }
@@ -42,6 +48,9 @@ const submitForm = async () => {
     }
   })
 }
+
+//汽车型号
+
 </script>
 <template>
 
@@ -52,14 +61,25 @@ const submitForm = async () => {
     :rules="rules"
     ref="formEl"
     >
-      <el-form-item label="类型：" prop="vehicleType">
+      <!-- <el-form-item label="类型：" prop="vehicleType">
         <el-input v-model="form.vehicleType" autocomplete="off"/>
-      </el-form-item>
+      </el-form-item> -->
+    <el-radio-group v-model="form.vehicleType" size="large">
+      <el-radio-button label="轿车" />
+      <el-radio-button label="客车" />
+      <el-radio-button label="货车" />
+    </el-radio-group>
       <el-form-item label="品牌：" prop="vehicleBrand">
         <el-input v-model="form.vehicleBrand" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="型号：" prop="vehicleModel">
         <el-input v-model="form.vehicleModel" autocomplete="off"/>
+      </el-form-item>
+      <el-form-item v-if="form.vehicleType === '客车'" label="载客量：" prop="bigger">
+        <el-input v-model="form.bigger" autocomplete="off"/>
+      </el-form-item>
+      <el-form-item v-if="form.vehicleType === '货车'" label="载重量：" prop="bigger">
+        <el-input v-model="form.bigger" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="日租金：" prop="perRent">
         <el-input v-model="form.perRent" autocomplete="off"/>

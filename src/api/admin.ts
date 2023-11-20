@@ -2,7 +2,7 @@ import request from "../utils/request";
 import { useAdminStore } from "../stores/index"
 
 
-//增加车辆
+//增加车辆    //今天突然发现没必要解构，直接把obj传入，data会自动解构的
 export const addCar = (obj) => {
   const adminStore = useAdminStore()
   const token = adminStore.getToken()

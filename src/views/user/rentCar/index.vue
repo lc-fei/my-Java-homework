@@ -27,6 +27,11 @@ const tableData = ref([
 onMounted(async () => {
   try{
     const res = await searchCar(changeValue.value)
+    res.data.vehicleInfos.forEach(item => {
+      if(item.type === '客车') item.brand += '人)'
+      else if(item.type === '货车') item.brand += '吨)'
+      else return
+    })
     tableData.value = res.data.vehicleInfos
     console.log(tableData.value)
   }catch (err) {
